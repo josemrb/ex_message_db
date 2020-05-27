@@ -1,8 +1,11 @@
 defmodule ExMessageDbTest do
-  use ExUnit.Case
-  doctest ExMessageDb
+  @moduledoc false
+  use ExMessageDb.RepoCase
+  alias ExMessageDb
 
-  test "greets the world" do
-    assert ExMessageDb.hello() == :world
+  describe "message_store_version/0" do
+    test "returns current version" do
+      assert {:ok, "1.2.3"} = ExMessageDb.message_store_version()
+    end
   end
 end

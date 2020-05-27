@@ -2,17 +2,12 @@ defmodule ExMessageDb do
   @moduledoc """
   Documentation for `ExMessageDb`.
   """
+  alias ExMessageDb.{Repo, Service}
 
   @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> ExMessageDb.hello()
-      :world
-
+  Returns the version number of the message store database.
   """
-  def hello do
-    :world
+  def message_store_version do
+    Service.message_store_version(Repo)
   end
 end
