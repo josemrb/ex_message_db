@@ -105,7 +105,7 @@ defmodule ExMessageDB.Adapter do
 
   defp map_result({:ok, %Postgrex.Result{num_rows: num_rows, rows: rows}}, opts)
        when num_rows > 0 and is_list(rows) and is_list(opts) do
-    Enum.map(rows, &map_row_to_message(&1, opts))
+    {:ok, Enum.map(rows, &map_row_to_message(&1, opts))}
   end
 
   defp map_result({:error, %Postgrex.Error{postgres: %{message: message}}}, opts)

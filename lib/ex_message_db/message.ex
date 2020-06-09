@@ -47,7 +47,14 @@ defmodule ExMessageDB.Message do
   """
   def load({id, stream_name, type, position, global_position, json_data, json_metadata, time}) do
     data = Jason.decode!(json_data)
-    metadata = Jason.decode!(json_metadata)
+
+    metadata =
+      if is_nil(json_metadata) do
+        nil
+      else
+        Jason.decode!(json_metadata)
+      end
+
     module = String.to_existing_atom(type)
     module_data = Ecto.embedded_load(module, data, :json)
 

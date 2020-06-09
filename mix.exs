@@ -26,7 +26,8 @@ defmodule ExMessageDB.MixProject do
       {:postgrex, "~> 0.15"},
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
-      {:ex_doc, "~> 0.22", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
+      {:ex_machina, "~> 2.4", only: :test}
     ]
   end
 
