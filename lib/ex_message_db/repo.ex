@@ -1,4 +1,6 @@
-defmodule ExMessageDb.Repo do
+defmodule ExMessageDB.Repo do
+  @moduledoc false
+
   use Ecto.Repo,
     otp_app: :ex_message_db,
     adapter: Ecto.Adapters.Postgres,

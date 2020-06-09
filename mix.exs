@@ -1,4 +1,4 @@
-defmodule ExMessageDb.MixProject do
+defmodule ExMessageDB.MixProject do
   use Mix.Project
 
   def project do
@@ -15,7 +15,7 @@ defmodule ExMessageDb.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {ExMessageDb.Application, []}
+      mod: {ExMessageDB.Application, []}
     ]
   end
 

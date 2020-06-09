@@ -1,4 +1,4 @@
-# ExMessageDb
+# ExMessageDB
 
 **TODO: Add description**
 

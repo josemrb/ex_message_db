@@ -1,13 +1,13 @@
-defmodule ExMessageDb.Application do
+defmodule ExMessageDB.Application do
   @moduledoc false
   use Application
 
   def start(_type, _args) do
     children = [
-      {ExMessageDb.Repo, []}
+      {ExMessageDB.Repo, []}
     ]
 
-    opts = [strategy: :one_for_one, name: ExMessageDb.Supervisor]
+    opts = [strategy: :one_for_one, name: ExMessageDB.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end
