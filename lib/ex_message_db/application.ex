@@ -2,7 +2,7 @@ defmodule ExMessageDB.Application do
   @moduledoc false
   use Application
 
-  def start(_type, _args) do
+  def start(_, _) do
     children = [
       {ExMessageDB.Repo, []}
     ]

@@ -5,6 +5,8 @@ defmodule ExMessageDB.Message do
 
   use Ecto.Type
 
+  defstruct [:id, :stream_name, :type, :position, :global_position, :data, :metadata, :time]
+
   @typedoc """
   A representation of Message data type.
   """
@@ -19,13 +21,12 @@ defmodule ExMessageDB.Message do
           time: DateTime.t()
         }
 
-  defstruct [:id, :stream_name, :type, :position, :global_position, :data, :metadata, :time]
-
   @doc """
   Casts to Message.
   """
+  @spec cast(data :: map() | list()) :: {:ok, t()} | :error
   def cast(data) when is_map(data) or is_list(data) do
-    struct(%__MODULE__{}, data)
+    {:ok, struct!(%__MODULE__{}, data)}
   end
 
   def cast(_), do: :error
@@ -33,11 +34,15 @@ defmodule ExMessageDB.Message do
   @doc """
   Converts a Message into a Tuple.
   """
+  @spec dump(message :: t()) :: {:ok, tuple()} | :error
   def dump(%__MODULE__{} = message) do
-    message
-    |> Map.from_struct()
-    |> Map.values()
-    |> List.to_tuple()
+    result =
+      message
+      |> Map.from_struct()
+      |> Map.values()
+      |> List.to_tuple()
+
+    {:ok, result}
   end
 
   def dump(_), do: :error
@@ -45,18 +50,14 @@ defmodule ExMessageDB.Message do
   @doc """
   Converts a Tuple into a Message.
   """
+  @spec load(data :: tuple()) :: {:ok, t()} | :error
   def load(
-        {id, stream_name, type_module, position, global_position, json_data, json_metadata, time}
+        {id, stream_name, type_string, position, global_position, json_data, json_metadata, time}
       ) do
-    type = String.to_existing_atom(type_module)
+    type = String.to_existing_atom(type_string)
 
-    data =
-      if is_nil(json_data) do
-        nil
-      else
-        map_data = Jason.decode!(json_data)
-        Ecto.embedded_load(type, map_data, :json)
-      end
+    map_data = Jason.decode!(json_data)
+    data = Ecto.embedded_load(type, map_data, :json)
 
     metadata =
       if is_nil(json_metadata) do
@@ -66,7 +67,7 @@ defmodule ExMessageDB.Message do
       end
 
     {:ok,
-     %__MODULE__{
+     struct!(%__MODULE__{}, %{
        id: id,
        stream_name: stream_name,
        type: type,
@@ -75,7 +76,7 @@ defmodule ExMessageDB.Message do
        data: data,
        metadata: metadata,
        time: time
-     }}
+     })}
   end
 
   def load(_), do: :error

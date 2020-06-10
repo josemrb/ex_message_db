@@ -5,7 +5,8 @@ defmodule ExMessageDB.Adapter do
 
   alias Ecto.Repo
 
-  alias ExMessageDB.{Functions, Message}
+  alias ExMessageDB.Functions
+  alias ExMessageDB.Message
 
   @spec get_category_messages(
           category_name :: String.t(),

@@ -1,6 +1,6 @@
 defmodule ExMessageDB.RepoCase do
-  use ExUnit.CaseTemplate
   @moduledoc false
+  use ExUnit.CaseTemplate
   alias Ecto.Adapters.SQL.Sandbox
 
   using do

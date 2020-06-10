@@ -7,7 +7,8 @@ defmodule ExMessageDB.MessageStoreFactory do
 
   alias Ecto.UUID
 
-  alias ExMessageDB.{DataGenerator, TestEvent}
+  alias ExMessageDB.DataGenerator
+  alias ExMessageDB.TestEvent
 
   def message_factory(attrs) when is_map(attrs) do
     category_name = Map.get(attrs, :category_name, "stream")
