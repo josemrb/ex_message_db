@@ -5,12 +5,9 @@ defmodule ExMessageDB.RepoCase do
 
   using do
     quote do
-      alias ExMessageDB.DataGenerator, as: G
+      alias ExMessageDB.Message
       alias ExMessageDB.Repo
-      alias ExMessageDB.TestEvent
 
-      import Ecto
-      import Ecto.Query
       import ExMessageDB.MessageStoreFactory
       import ExMessageDB.RepoCase
     end

@@ -59,7 +59,7 @@ defmodule ExMessageDB.Message do
     module_data = Ecto.embedded_load(module, data, :json)
 
     {:ok,
-     %{
+     %__MODULE__{
        id: id,
        stream_name: stream_name,
        type: module,
