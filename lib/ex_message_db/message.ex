@@ -31,7 +31,7 @@ defmodule ExMessageDB.Message do
   def cast(_), do: :error
 
   @doc """
-  Converts a Message into a tuple.
+  Converts a Message into a Tuple.
   """
   def dump(%__MODULE__{} = message) do
     message
@@ -43,10 +43,20 @@ defmodule ExMessageDB.Message do
   def dump(_), do: :error
 
   @doc """
-  Converts a tuple into a Message.
+  Converts a Tuple into a Message.
   """
-  def load({id, stream_name, type, position, global_position, json_data, json_metadata, time}) do
-    data = Jason.decode!(json_data)
+  def load(
+        {id, stream_name, type_module, position, global_position, json_data, json_metadata, time}
+      ) do
+    type = String.to_existing_atom(type_module)
+
+    data =
+      if is_nil(json_data) do
+        nil
+      else
+        map_data = Jason.decode!(json_data)
+        Ecto.embedded_load(type, map_data, :json)
+      end
 
     metadata =
       if is_nil(json_metadata) do
@@ -55,17 +65,14 @@ defmodule ExMessageDB.Message do
         Jason.decode!(json_metadata)
       end
 
-    module = String.to_existing_atom(type)
-    module_data = Ecto.embedded_load(module, data, :json)
-
     {:ok,
      %__MODULE__{
        id: id,
        stream_name: stream_name,
-       type: module,
+       type: type,
        position: position,
        global_position: global_position,
-       data: module_data,
+       data: data,
        metadata: metadata,
        time: time
      }}

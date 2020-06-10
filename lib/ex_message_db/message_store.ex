@@ -17,7 +17,15 @@ defmodule ExMessageDB.MessageStore do
               category_name :: String.t(),
               position :: non_neg_integer() | nil,
               batch_size :: non_neg_integer() | -1 | nil
-            ) :: {:ok, [] | [%{message: Message.t()}]} | {:error, message :: String.t()}
+            ) :: [] | [%{message: Message.t()}] | {:error, message :: String.t()}
+
+  @doc """
+  Returns the row from the messages table that corresponds to the highest position number
+  in the stream.
+  """
+  @doc since: "0.1.0"
+  @callback get_last_stream_message(stream_name :: String.t()) ::
+              nil | %{message: Message.t()}
 
   @doc """
   Retrieve messages from a single stream, optionally specifying the starting position, the number
@@ -29,14 +37,14 @@ defmodule ExMessageDB.MessageStore do
               position :: non_neg_integer() | nil,
               batch_size :: non_neg_integer() | -1 | nil
             ) ::
-              {:ok, [] | [%{message: Message.t()}]} | {:error, message :: String.t()}
+              [] | [%{message: Message.t()}] | {:error, message :: String.t()}
 
   @doc """
   Returns the version number of the message store database.
   """
   @doc since: "0.1.0"
   @callback message_store_version() ::
-              {:ok, string_version :: String.t()} | {:error, message :: String.t()}
+              string_version :: String.t()
 
   @doc """
   Write a JSON-formatted message to a named stream, optionally specifying JSON-formatted metadata
@@ -85,6 +93,11 @@ defmodule ExMessageDB.MessageStore do
           nil,
           repo: @repo
         )
+      end
+
+      @impl true
+      def get_last_stream_message(stream_name) do
+        Adapter.get_last_stream_message(stream_name, repo: @repo)
       end
 
       @impl true
