@@ -61,6 +61,14 @@ defmodule ExMessageDB.MessageStore do
               expected_version: expected_version :: non_neg_integer() | -1 | nil
             }) ::
               {:ok, position :: non_neg_integer()} | {:error, message :: String.t()}
+
+  @doc """
+  Write a JSON-formatted message to a named stream, optionally specifying JSON-formatted metadata
+  and an expected version number.
+
+  Returns the position of the message written.
+  """
+  @doc since: "0.1.0"
   @callback write_message(
               id :: String.t(),
               stream_name :: String.t(),
@@ -81,7 +89,6 @@ defmodule ExMessageDB.MessageStore do
 
       alias ExMessageDB.Adapter
 
-      @impl true
       def get_category_messages(category_name, position \\ nil, batch_size \\ nil) do
         Adapter.get_category_messages(
           category_name,
@@ -95,12 +102,10 @@ defmodule ExMessageDB.MessageStore do
         )
       end
 
-      @impl true
       def get_last_stream_message(stream_name) do
         Adapter.get_last_stream_message(stream_name, repo: @repo)
       end
 
-      @impl true
       def get_stream_messages(stream_name, position \\ nil, batch_size \\ nil) do
         Adapter.get_stream_messages(
           stream_name,
@@ -111,12 +116,10 @@ defmodule ExMessageDB.MessageStore do
         )
       end
 
-      @impl true
       def message_store_version do
         Adapter.message_store_version(repo: @repo)
       end
 
-      @impl true
       def write_message(
             %{
               id: id,
@@ -136,7 +139,6 @@ defmodule ExMessageDB.MessageStore do
         )
       end
 
-      @impl true
       def write_message(
             id,
             stream_name,
