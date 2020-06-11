@@ -109,7 +109,7 @@ defmodule ExMessageDB.Adapter do
     result
   end
 
-  defp map_first_result({:ok, %Postgrex.Result{num_rows: 1, rows: [result | _]}}, opts)
+  defp map_first_result({:ok, %Postgrex.Result{num_rows: 1, rows: [result | []]}}, opts)
        when is_list(result) and is_list(opts) do
     map_row(result, opts)
   end

@@ -36,7 +36,7 @@ defmodule ExMessageDBTest do
 
   describe "get_category_messages/2" do
     setup do
-      Repo.query!("ALTER SEQUENCE message_store.messages_global_position_seq RESTART WITH 1")
+      Repo.query!("ALTER SEQUENCE messages_global_position_seq RESTART WITH 1")
       :ok
     end
 
@@ -73,7 +73,7 @@ defmodule ExMessageDBTest do
 
   describe "get_category_messages/3" do
     setup do
-      Repo.query!("ALTER SEQUENCE message_store.messages_global_position_seq RESTART WITH 1")
+      Repo.query!("ALTER SEQUENCE messages_global_position_seq RESTART WITH 1")
       :ok
     end
 

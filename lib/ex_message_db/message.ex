@@ -29,7 +29,7 @@ defmodule ExMessageDB.Message do
     {:ok, struct!(%__MODULE__{}, data)}
   end
 
-  def cast(_), do: :error
+  def cast(_data), do: :error
 
   @doc """
   Converts a Message into a Tuple.
@@ -45,7 +45,7 @@ defmodule ExMessageDB.Message do
     {:ok, result}
   end
 
-  def dump(_), do: :error
+  def dump(_message), do: :error
 
   @doc """
   Converts a Tuple into a Message.
@@ -79,7 +79,7 @@ defmodule ExMessageDB.Message do
      })}
   end
 
-  def load(_), do: :error
+  def load(_data), do: :error
 
   @doc """
   Returns the underlying schema type.
