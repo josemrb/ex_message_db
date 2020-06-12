@@ -1,0 +1,78 @@
+version: v1.0
+name: CI
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Install dependencies
+    task:
+      env_vars:
+        - name: MIX_ENV
+          value: test
+      prologue:
+        commands:
+          - sem-version erlang 22.3
+          - sem-version elixir 1.10.3
+          - mix local.hex --force
+          - mix local.rebar --force
+      jobs:
+        - name: mix and cache
+          commands:
+            - checkout
+            - cache restore mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+            - cache restore mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+            - mix deps.get --only $MIX_ENV
+            - mix deps.compile
+            - mix do clean, compile
+            - cache store mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) deps
+            - cache store mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) _build
+  - name: Code quality
+    task:
+      env_vars:
+        - name: MIX_ENV
+          value: test
+      prologue:
+        commands:
+          - sem-version erlang 22.3
+          - sem-version elixir 1.10.3
+          - mix local.hex --force
+          - mix local.rebar --force
+          - checkout
+          - cache restore mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+          - cache restore mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+      jobs:
+        - name: formatter
+          commands:
+            - mix format --check-formatted
+        - name: credo
+          commands:
+            - mix credo --strict
+  - name: Run tests
+    task:
+      env_vars:
+        - name: PGUSER
+          value: postgres
+        - name: PGHOST
+          value: 0.0.0.0
+        - name: DATABASE_NAME
+          value: ex_message_db_test
+        - name: MIX_ENV
+          value: test
+      prologue:
+        commands:
+          - sem-version erlang 22.3
+          - sem-version elixir 1.10.3
+          - mix local.hex --force
+          - mix local.rebar --force
+          - checkout
+          - git submodule init
+          - git submodule update --depth 1
+          - cache restore mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+          - cache restore mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+          - sem-service start postgres 12
+          - ./priv/message-db/database/install.sh
+      jobs:
+        - name: tests
+          commands:
+            - mix test
