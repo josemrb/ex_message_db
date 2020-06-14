@@ -56,23 +56,25 @@ defmodule ExMessageDB.MessageStore do
   @callback write_message(%{
               id: id :: String.t(),
               stream_name: stream_name :: String.t(),
-              data: embedded_schema :: Schema.embedded_schema(),
-              metadata: metadata :: map() | nil,
-              expected_version: expected_version :: non_neg_integer() | -1 | nil
+              embedded_data: Schema.embedded_schema()
+            }) ::
+              {:ok, position :: non_neg_integer()} | {:error, message :: String.t()}
+  @callback write_message(%{
+              id: id :: String.t(),
+              stream_name: stream_name :: String.t(),
+              type: type :: String.t(),
+              data: map()
             }) ::
               {:ok, position :: non_neg_integer()} | {:error, message :: String.t()}
 
   @doc """
-  Write a JSON-formatted message to a named stream, optionally specifying JSON-formatted metadata
-  and an expected version number.
-
-  Returns the position of the message written.
+  See `write_message/1`
   """
   @doc since: "0.1.0"
   @callback write_message(
               id :: String.t(),
               stream_name :: String.t(),
-              embedded_schema :: Schema.embedded_schema(),
+              embedded_data :: Schema.embedded_schema(),
               metadata :: map() | nil,
               expected_version :: non_neg_integer() | -1 | nil
             ) ::
@@ -89,7 +91,8 @@ defmodule ExMessageDB.MessageStore do
 
       alias ExMessageDB.Adapter
 
-      def get_category_messages(category_name, position \\ nil, batch_size \\ nil) do
+      def get_category_messages(category_name, position \\ nil, batch_size \\ nil)
+          when is_binary(category_name) do
         Adapter.get_category_messages(
           category_name,
           position,
@@ -102,11 +105,12 @@ defmodule ExMessageDB.MessageStore do
         )
       end
 
-      def get_last_stream_message(stream_name) do
+      def get_last_stream_message(stream_name) when is_binary(stream_name) do
         Adapter.get_last_stream_message(stream_name, repo: @repo)
       end
 
-      def get_stream_messages(stream_name, position \\ nil, batch_size \\ nil) do
+      def get_stream_messages(stream_name, position \\ nil, batch_size \\ nil)
+          when is_binary(stream_name) do
         Adapter.get_stream_messages(
           stream_name,
           position,
@@ -124,32 +128,61 @@ defmodule ExMessageDB.MessageStore do
             %{
               id: id,
               stream_name: stream_name,
-              data: embedded_schema
+              embedded_data: embedded_data
             } = params
-          ) do
+          )
+          when is_binary(id) and is_binary(stream_name) and is_struct(embedded_data) do
         metadata = Map.get(params, :metadata)
         expected_version = Map.get(params, :expected_version)
 
         write_message(
           id,
           stream_name,
-          embedded_schema,
+          embedded_data,
           metadata,
           expected_version
         )
       end
 
       def write_message(
-            id,
-            stream_name,
-            embedded_schema,
-            metadata \\ nil,
-            expected_version \\ nil
-          ) do
+            %{
+              id: id,
+              stream_name: stream_name,
+              type: type,
+              data: data
+            } = params
+          )
+          when is_binary(id) and is_binary(stream_name) and is_binary(type) and is_map(data) do
+        metadata = Map.get(params, :metadata)
+        expected_version = Map.get(params, :expected_version)
+
         Adapter.write_message(
           id,
           stream_name,
-          embedded_schema,
+          type,
+          data,
+          metadata,
+          expected_version,
+          repo: @repo
+        )
+      end
+
+      def write_message(
+            id,
+            stream_name,
+            embedded_data,
+            metadata \\ nil,
+            expected_version \\ nil
+          )
+          when is_binary(id) and is_binary(stream_name) and is_struct(embedded_data) do
+        type = Atom.to_string(embedded_data.__struct__)
+        data = Map.from_struct(embedded_data)
+
+        Adapter.write_message(
+          id,
+          stream_name,
+          type,
+          data,
           metadata,
           expected_version,
           repo: @repo

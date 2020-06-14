@@ -17,9 +17,12 @@ defmodule ExMessageDBTest do
       messages_attrs = build_list(3, :message, %{category_name: category_name})
       Enum.map(messages_attrs, fn message_attrs -> ExMessageDB.write_message(message_attrs) end)
 
+      message_data_map_attrs = build(:message_data_map, %{category_name: category_name})
+      ExMessageDB.write_message(message_data_map_attrs)
+
       result_list = ExMessageDB.get_category_messages(category_name)
 
-      assert length(result_list) == 3
+      assert length(result_list) == 4
       assert %{message: %Message{} = message} = List.first(result_list)
       assert String.starts_with?(message.stream_name, category_name)
     end
@@ -124,6 +127,9 @@ defmodule ExMessageDBTest do
       messages_attrs = build_list(3, :message, %{stream_name: stream_name})
       Enum.map(messages_attrs, fn message_attrs -> ExMessageDB.write_message(message_attrs) end)
 
+      message_data_map_attrs = build(:message_data_map, %{stream_name: stream_name})
+      ExMessageDB.write_message(message_data_map_attrs)
+
       assert %{message: %Message{} = message} = ExMessageDB.get_last_stream_message(stream_name)
       assert message.stream_name == stream_name
     end
@@ -141,9 +147,12 @@ defmodule ExMessageDBTest do
       messages_attrs = build_list(3, :message, %{stream_name: stream_name})
       Enum.map(messages_attrs, fn message_attrs -> ExMessageDB.write_message(message_attrs) end)
 
+      message_data_map_attrs = build(:message_data_map, %{stream_name: stream_name})
+      ExMessageDB.write_message(message_data_map_attrs)
+
       result_list = ExMessageDB.get_stream_messages(stream_name)
 
-      assert length(result_list) == 3
+      assert length(result_list) == 4
       assert %{message: %Message{} = message} = List.first(result_list)
       assert message.stream_name == stream_name
     end
@@ -240,6 +249,13 @@ defmodule ExMessageDBTest do
       assert position == 0
     end
 
+    test "returns sucessfully with data map" do
+      message_attrs = build(:message_data_map)
+
+      assert {:ok, position} = ExMessageDB.write_message(message_attrs)
+      assert position == 0
+    end
+
     test "returns optimistic lock error" do
       wrong_version = 1
       message_attrs = build(:message, %{expected_version: wrong_version})
@@ -253,14 +269,14 @@ defmodule ExMessageDBTest do
 
   describe "write_message/3" do
     test "returns sucessfully" do
-      %{id: id, stream_name: stream_name, data: embedded_schema} = build(:message)
+      %{id: id, stream_name: stream_name, embedded_data: embedded_schema} = build(:message)
 
       assert {:ok, position} = ExMessageDB.write_message(id, stream_name, embedded_schema)
       assert position == 0
     end
 
     test "returns optimistic lock error" do
-      %{id: id, stream_name: stream_name, data: embedded_schema} = build(:message)
+      %{id: id, stream_name: stream_name, embedded_data: embedded_schema} = build(:message)
       wrong_version = 1
 
       assert {:error, result_message} =
@@ -273,7 +289,7 @@ defmodule ExMessageDBTest do
 
   describe "write_message/4" do
     test "returns sucessfully" do
-      %{id: id, stream_name: stream_name, data: embedded_schema} = build(:message)
+      %{id: id, stream_name: stream_name, embedded_data: embedded_schema} = build(:message)
       metadata = %{headers: %{"Accept-Encoding": "gzip", "accept-language": "en-US"}}
 
       assert {:ok, position} =
@@ -283,7 +299,7 @@ defmodule ExMessageDBTest do
     end
 
     test "returns optimistic lock error" do
-      %{id: id, stream_name: stream_name, data: embedded_schema} = build(:message)
+      %{id: id, stream_name: stream_name, embedded_data: embedded_schema} = build(:message)
       metadata = %{headers: %{"Accept-Encoding": "gzip", "accept-language": "en-US"}}
       wrong_version = 2
 
@@ -303,7 +319,7 @@ defmodule ExMessageDBTest do
 
   describe "write_message/5" do
     test "returns sucessfully" do
-      %{id: id, stream_name: stream_name, data: embedded_schema} = build(:message)
+      %{id: id, stream_name: stream_name, embedded_data: embedded_schema} = build(:message)
       expected_version = -1
 
       assert {:ok, position} =
@@ -313,7 +329,7 @@ defmodule ExMessageDBTest do
     end
 
     test "returns optimistic lock error" do
-      %{id: id, stream_name: stream_name, data: embedded_schema} = build(:message)
+      %{id: id, stream_name: stream_name, embedded_data: embedded_schema} = build(:message)
       wrong_position = 3
 
       assert {:error, result_message} =

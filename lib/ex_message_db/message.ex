@@ -34,10 +34,10 @@ defmodule ExMessageDB.Message do
   @doc """
   Converts a Message into a Tuple.
   """
-  @spec dump(message :: t()) :: {:ok, tuple()} | :error
-  def dump(%__MODULE__{} = message) do
+  @spec dump(data :: t()) :: {:ok, tuple()} | :error
+  def dump(%__MODULE__{} = data) do
     result =
-      message
+      data
       |> Map.from_struct()
       |> Map.values()
       |> List.to_tuple()
@@ -54,17 +54,9 @@ defmodule ExMessageDB.Message do
   def load(
         {id, stream_name, type_string, position, global_position, json_data, json_metadata, time}
       ) do
-    type = String.to_existing_atom(type_string)
+    {type, data} = load_data(type_string, json_data)
 
-    map_data = Jason.decode!(json_data)
-    data = Ecto.embedded_load(type, map_data, :json)
-
-    metadata =
-      if is_nil(json_metadata) do
-        nil
-      else
-        Jason.decode!(json_metadata)
-      end
+    metadata = load_metadata(json_metadata)
 
     {:ok,
      struct!(%__MODULE__{}, %{
@@ -85,4 +77,24 @@ defmodule ExMessageDB.Message do
   Returns the underlying schema type.
   """
   def type, do: :message
+
+  defp load_data(type_string, json_data) do
+    # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom
+    possible_module = String.to_atom(type_string)
+    map_data = Jason.decode!(json_data)
+
+    if Code.ensure_loaded?(possible_module) do
+      {possible_module, Ecto.embedded_load(possible_module, map_data, :json)}
+    else
+      {type_string, map_data}
+    end
+  end
+
+  defp load_metadata(json_metadata) do
+    if is_nil(json_metadata) do
+      nil
+    else
+      Jason.decode!(json_metadata)
+    end
+  end
 end

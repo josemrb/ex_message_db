@@ -82,14 +82,13 @@ defmodule ExMessageDB.Adapter do
   @spec write_message(
           id :: String.t(),
           stream_name :: String.t(),
-          embedded_schema :: Ecto.Schema.embedded_schema(),
+          type :: String.t(),
+          data :: map(),
           metadata :: map() | nil,
           expected_version :: non_neg_integer() | -1 | nil,
           opts :: [{:repo, Repo.t()}]
         ) :: {:ok, position :: non_neg_integer()} | {:error, message :: String.t()}
-  def write_message(id, stream_name, embedded_schema, metadata, expected_version, opts) do
-    type = Atom.to_string(embedded_schema.__struct__)
-    data = Map.from_struct(embedded_schema)
+  def write_message(id, stream_name, type, data, metadata, expected_version, opts) do
     repo = Keyword.fetch!(opts, :repo)
 
     {sql, params} =
