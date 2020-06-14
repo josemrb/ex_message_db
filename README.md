@@ -115,7 +115,7 @@ iex> ExMessageDB.get_stream_messages("account-1")
 ]
 ```
 
-The documentation can be found at [hexdocs](https://hexdocs.pm/ex_message_db).
+The documentation can be found at [hexdocs](https://hexdocs.pm/ex_message_db/).
 
 ## Copyright and License
 
