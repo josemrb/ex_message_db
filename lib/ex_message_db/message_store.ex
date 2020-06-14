@@ -1,6 +1,13 @@
 defmodule ExMessageDB.MessageStore do
   @moduledoc """
-  Message Store.
+  Defines a message store.
+
+  When used, the message store expects the `:repo` option.
+  For example:
+
+      defmodule MyApp.MessageStore do
+        use ExMessageDB.MessageStore, repo: MyApp.Repo
+      end
   """
   @moduledoc since: "0.1.0"
 
@@ -68,7 +75,7 @@ defmodule ExMessageDB.MessageStore do
               {:ok, position :: non_neg_integer()} | {:error, message :: String.t()}
 
   @doc """
-  See `write_message/1`
+  See `c:write_message/1` for more information.
   """
   @doc since: "0.1.0"
   @callback write_message(

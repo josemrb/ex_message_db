@@ -7,8 +7,14 @@ defmodule ExMessageDB.MixProject do
       version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      dialyzer: [flags: [:error_handling, :race_conditions, :underspecs, :unmatched_returns]],
       deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      description: description(),
+      package: package(),
+      name: "ExMessageDB",
+      source_url: "https://github.com/josemrb/ex_message_db",
+      docs: docs()
     ]
   end
 
@@ -33,6 +39,24 @@ defmodule ExMessageDB.MixProject do
     ]
   end
 
+  defp description do
+    """
+    An Elixir client for Message DB.
+    """
+  end
+
+  defp docs do
+    [main: "readme", extras: ["README.md"]]
+  end
+
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp package do
+    [
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/josemrb/ex_message_db"},
+      files: ["lib", "priv", "mix.exs", "README*", "LICENSE*"]
+    ]
+  end
 end

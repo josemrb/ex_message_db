@@ -1,6 +1,6 @@
 defmodule ExMessageDB do
   @moduledoc """
-  An Elixir Message DB Client.
+  An Elixir client for Message DB.
   """
 
   use ExMessageDB.MessageStore, repo: ExMessageDB.Repo
