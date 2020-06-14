@@ -1,6 +1,6 @@
 # ExMessageDB
 
-[![Build Status](https://josemrb.semaphoreci.com/badges/ex_message_db.svg)] [![Hex Version](https://img.shields.io/hexpm/v/ex_message_db.svg?style=flat)](https://hex.pm/packages/ex_message_db)
+[![Build Status](https://josemrb.semaphoreci.com/badges/ex_message_db.svg)](https://josemrb.semaphoreci.com/projects/ex_message_db) [![Hex Version](https://img.shields.io/hexpm/v/ex_message_db.svg?style=flat)](https://hex.pm/packages/ex_message_db)
 
 An Elixir client for [Message DB](https://github.com/message-db/message-db).
 
