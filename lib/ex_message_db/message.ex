@@ -33,6 +33,8 @@ defmodule ExMessageDB.Message do
 
   @doc """
   Converts a Message into a Tuple.
+
+  TODO is the order guaranteed...?
   """
   @spec dump(data :: t()) :: {:ok, tuple()} | :error
   def dump(%__MODULE__{} = data) do
