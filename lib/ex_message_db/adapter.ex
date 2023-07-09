@@ -46,6 +46,8 @@ defmodule ExMessageDB.Adapter do
     |> map_results(opts)
   end
 
+  # TODO I don't want my Message contained in a stupid map
+  # TODO This function can also apparently return an error tuple
   @spec get_last_stream_message(stream_name :: String.t(), Repo.t()) :: maybe(%{message: Message.t()})
   def get_last_stream_message(stream_name, repo) do
     sql = "SELECT get_last_stream_message($1)",
