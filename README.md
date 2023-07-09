@@ -64,7 +64,7 @@ iex> ExMessageDB.write_message(message1)
 iex> message2 = %{
   id: "904ae0d1-8239-4ded-8c34-7bb7f7caefe3",
   stream_name: "account-1",
-  type: "EmailAdded"
+  type: "EmailAdded",
   data: %{email: "account@company.com"},
 }
 iex> ExMessageDB.write_message(message1)
