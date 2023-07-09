@@ -99,19 +99,12 @@ defmodule ExMessageDB.Adapter do
     |> map_tuple_result(opts)
   end
 
-  defp map_first_result({:ok, %Postgrex.Result{num_rows: 0, rows: []}}, opts)
-       when is_list(opts) do
-    nil
-  end
-
-  defp map_first_result({:ok, %Postgrex.Result{num_rows: 1, rows: [[result]]}}, opts)
-       when (is_binary(result) or is_integer(result)) and is_list(opts) do
-    result
-  end
-
-  defp map_first_result({:ok, %Postgrex.Result{num_rows: 1, rows: [result | []]}}, opts)
-       when is_list(result) and is_list(opts) do
-    map_row(result, opts)
+  defp map_first_result({:ok, %Postgrex.Result{rows: rows}}, opts) do
+    case rows do
+      [] -> nil
+      [result | _] when is_binary(result) or is_integer(result) -> result
+      [result | _] -> map_row(result, opts)
+    end
   end
 
   defp map_first_result({:error, %Postgrex.Error{postgres: %{message: message}}}, opts)
