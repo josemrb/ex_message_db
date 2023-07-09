@@ -7,6 +7,8 @@ defmodule ExMessageDB.Adapter do
   alias ExMessageDB.Functions
   alias ExMessageDB.Message
 
+  @type maybe(t) :: nil | t
+
   @spec get_category_messages(
           category_name :: String.t(),
           position :: non_neg_integer() | nil,
