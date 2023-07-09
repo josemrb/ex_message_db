@@ -1,10 +1,9 @@
 defmodule ExMessageDB.Adapter do
   @moduledoc """
-  Adapter.
+  Adapter
   """
 
   alias Ecto.Repo
-
   alias ExMessageDB.Functions
   alias ExMessageDB.Message
 
