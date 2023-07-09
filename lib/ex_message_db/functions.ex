@@ -29,17 +29,6 @@ defmodule ExMessageDB.Functions do
     }
   end
 
-  @spec get_last_stream_message(stream_name :: String.t()) ::
-          {sql :: String.t(), params :: [term()]}
-  def get_last_stream_message(stream_name) do
-    function_call = "get_last_stream_message($1)"
-
-    {
-      "SELECT #{function_call}",
-      [stream_name]
-    }
-  end
-
   @spec get_stream_messages(
           stream_name :: String.t(),
           position :: non_neg_integer() | nil,

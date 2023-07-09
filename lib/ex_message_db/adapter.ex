@@ -44,14 +44,12 @@ defmodule ExMessageDB.Adapter do
     |> map_results(opts)
   end
 
-  @spec get_last_stream_message(stream_name :: String.t(), opts :: [{:repo, Repo.t()}]) ::
-          nil | %{message: Message.t()}
-  def get_last_stream_message(stream_name, opts) do
-    repo = Keyword.fetch!(opts, :repo)
-    {sql, params} = Functions.get_last_stream_message(stream_name)
-
+  @spec get_last_stream_message(stream_name :: String.t(), Repo.t()) :: maybe(%{message: Message.t()})
+  def get_last_stream_message(stream_name, repo) do
+    sql = "SELECT get_last_stream_message($1)",
+    params = [stream_name]
     repo.query(sql, params)
-    |> map_first_result(opts)
+    |> map_first_result([])
   end
 
   @spec get_stream_messages(

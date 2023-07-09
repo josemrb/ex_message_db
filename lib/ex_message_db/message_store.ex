@@ -113,7 +113,7 @@ defmodule ExMessageDB.MessageStore do
       end
 
       def get_last_stream_message(stream_name) when is_binary(stream_name) do
-        Adapter.get_last_stream_message(stream_name, repo: @repo)
+        Adapter.get_last_stream_message(stream_name, @repo)
       end
 
       def get_stream_messages(stream_name, position \\ nil, batch_size \\ nil)
