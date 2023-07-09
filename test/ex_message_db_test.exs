@@ -5,6 +5,8 @@ defmodule ExMessageDBTest do
 
   use ExMessageDB.RepoCase
 
+  @stream_name "category-x"
+
   describe "get_category_messages/1" do
     test "when category is empty returns sucessfully" do
       category_name = "category"
@@ -28,11 +30,8 @@ defmodule ExMessageDBTest do
     end
 
     test "returns category name error" do
-      stream_name = "category-x"
-
-      assert {:error, result_message} = ExMessageDB.get_category_messages(stream_name)
-
-      error_message = "Must be a category: #{stream_name}"
+      assert {:error, result_message} = ExMessageDB.get_category_messages(@stream_name)
+      error_message = "Must be a category: #{@stream_name}"
       assert String.starts_with?(result_message, error_message)
     end
   end
@@ -64,12 +63,9 @@ defmodule ExMessageDBTest do
     end
 
     test "returns category name error" do
-      stream_name = "category-x"
       position = 2
-
-      assert {:error, result_message} = ExMessageDB.get_category_messages(stream_name, position)
-
-      error_message = "Must be a category: #{stream_name}"
+      assert {:error, result_message} = ExMessageDB.get_category_messages(@stream_name, position)
+      error_message = "Must be a category: #{@stream_name}"
       assert String.starts_with?(result_message, error_message)
     end
   end
@@ -103,58 +99,51 @@ defmodule ExMessageDBTest do
     end
 
     test "returns category name error" do
-      stream_name = "category-x"
       position = 2
       batch_size = 5
 
       assert {:error, result_message} =
-               ExMessageDB.get_category_messages(stream_name, position, batch_size)
+               ExMessageDB.get_category_messages(@stream_name, position, batch_size)
 
-      error_message = "Must be a category: #{stream_name}"
+      error_message = "Must be a category: #{@stream_name}"
       assert String.starts_with?(result_message, error_message)
     end
   end
 
   describe "get_last_stream_message/1" do
     test "when stream is empty returns sucessfully" do
-      stream_name = "category-x"
-
-      assert nil == ExMessageDB.get_last_stream_message(stream_name)
+      assert nil == ExMessageDB.get_last_stream_message(@stream_name)
     end
 
     test "when stream contains elements returns sucessfully" do
-      stream_name = "category-x"
-      messages_attrs = build_list(3, :message, %{stream_name: stream_name})
+      messages_attrs = build_list(3, :message, %{stream_name: @stream_name})
       Enum.map(messages_attrs, fn message_attrs -> ExMessageDB.write_message(message_attrs) end)
 
-      message_data_map_attrs = build(:message_data_map, %{stream_name: stream_name})
+      message_data_map_attrs = build(:message_data_map, %{stream_name: @stream_name})
       ExMessageDB.write_message(message_data_map_attrs)
 
-      assert %{message: %Message{} = message} = ExMessageDB.get_last_stream_message(stream_name)
-      assert message.stream_name == stream_name
+      assert %{message: %Message{} = message} = ExMessageDB.get_last_stream_message(@stream_name)
+      assert message.stream_name == @stream_name
     end
   end
 
   describe "get_stream_messages/1" do
     test "when stream is empty returns sucessfully" do
-      stream_name = "category-x"
-
-      assert [] == ExMessageDB.get_stream_messages(stream_name)
+      assert [] == ExMessageDB.get_stream_messages(@stream_name)
     end
 
     test "when stream contains elements returns sucessfully" do
-      stream_name = "category-x"
-      messages_attrs = build_list(3, :message, %{stream_name: stream_name})
+      messages_attrs = build_list(3, :message, %{stream_name: @stream_name})
       Enum.map(messages_attrs, fn message_attrs -> ExMessageDB.write_message(message_attrs) end)
 
-      message_data_map_attrs = build(:message_data_map, %{stream_name: stream_name})
+      message_data_map_attrs = build(:message_data_map, %{stream_name: @stream_name})
       ExMessageDB.write_message(message_data_map_attrs)
 
-      result_list = ExMessageDB.get_stream_messages(stream_name)
+      result_list = ExMessageDB.get_stream_messages(@stream_name)
 
       assert length(result_list) == 4
       assert %{message: %Message{} = message} = List.first(result_list)
-      assert message.stream_name == stream_name
+      assert message.stream_name == @stream_name
     end
 
     test "returns stream name error" do
@@ -169,23 +158,20 @@ defmodule ExMessageDBTest do
 
   describe "get_stream_messages/2" do
     test "when stream is empty returns sucessfully" do
-      stream_name = "category-x"
       position = 2
-
-      assert [] == ExMessageDB.get_stream_messages(stream_name, position)
+      assert [] == ExMessageDB.get_stream_messages(@stream_name, position)
     end
 
     test "when stream contains elements returns sucessfully" do
-      stream_name = "category-x"
-      messages_attrs = build_list(5, :message, %{stream_name: stream_name})
+      messages_attrs = build_list(5, :message, %{stream_name: @stream_name})
       Enum.map(messages_attrs, fn message_attrs -> ExMessageDB.write_message(message_attrs) end)
 
       position = 3
-      result_list = ExMessageDB.get_stream_messages(stream_name, position)
+      result_list = ExMessageDB.get_stream_messages(@stream_name, position)
 
       assert length(result_list) == 2
       assert %{message: %Message{} = message} = List.first(result_list)
-      assert message.stream_name == stream_name
+      assert message.stream_name == @stream_name
     end
 
     test "returns stream name error" do
@@ -201,25 +187,23 @@ defmodule ExMessageDBTest do
 
   describe "get_stream_messages/3" do
     test "when stream is empty returns sucessfully" do
-      stream_name = "category-x"
       position = 2
       batch_size = 10
 
-      assert [] == ExMessageDB.get_stream_messages(stream_name, position, batch_size)
+      assert [] == ExMessageDB.get_stream_messages(@stream_name, position, batch_size)
     end
 
     test "when stream contains elements returns sucessfully" do
-      stream_name = "category-x"
-      messages_attrs = build_list(10, :message, %{stream_name: stream_name})
+      messages_attrs = build_list(10, :message, %{stream_name: @stream_name})
       Enum.map(messages_attrs, fn message_attrs -> ExMessageDB.write_message(message_attrs) end)
 
       position = 3
       batch_size = 5
-      result_list = ExMessageDB.get_stream_messages(stream_name, position, batch_size)
+      result_list = ExMessageDB.get_stream_messages(@stream_name, position, batch_size)
 
       assert length(result_list) == 5
       assert %{message: %Message{} = message} = List.first(result_list)
-      assert message.stream_name == stream_name
+      assert message.stream_name == @stream_name
     end
 
     test "returns stream name error" do
