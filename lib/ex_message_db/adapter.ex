@@ -67,7 +67,15 @@ defmodule ExMessageDB.Adapter do
   def write_message(id, stream_name, type, data, metadata, expected_version, opts) do
     sql = "SELECT write_message($1, $2, $3, $4, $5, $6)"
     params = [id, stream_name, type, data, metadata, expected_version]
-    repo.query(sql, params) |> map_tuple_result([])
+
+    case repo.query(sql, params) do
+      {:ok, %Postgrex.Result{num_rows: 1, rows: [[result]]}}
+      when is_binary(result) or is_integer(result) ->
+        {:ok, result}
+
+      {:error, %Postgrex.Error{postgres: %{message: message}}} when is_binary(message) ->
+        {:error, message}
+    end
   end
 
   defp map_first_result({:ok, %Postgrex.Result{rows: rows}}, opts) do
@@ -85,16 +93,6 @@ defmodule ExMessageDB.Adapter do
   end
 
   defp map_first_result({:error, %Postgrex.Error{postgres: %{message: message}}}, opts)
-       when is_binary(message) and is_list(opts) do
-    {:error, message}
-  end
-
-  defp map_tuple_result({:ok, %Postgrex.Result{num_rows: 1, rows: [[result]]}}, opts)
-       when (is_binary(result) or is_integer(result)) and is_list(opts) do
-    {:ok, result}
-  end
-
-  defp map_tuple_result({:error, %Postgrex.Error{postgres: %{message: message}}}, opts)
        when is_binary(message) and is_list(opts) do
     {:error, message}
   end
