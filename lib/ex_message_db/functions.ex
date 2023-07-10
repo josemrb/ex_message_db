@@ -3,16 +3,6 @@ defmodule ExMessageDB.Functions do
   Functions
   """
 
-  @spec message_store_version :: {sql :: String.t(), params :: []}
-  def message_store_version do
-    function_call = "message_store_version()"
-
-    {
-      "SELECT #{function_call}",
-      []
-    }
-  end
-
   @spec write_message(
           id :: String.t(),
           stream_name :: String.t(),

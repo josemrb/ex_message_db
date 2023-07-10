@@ -50,13 +50,10 @@ defmodule ExMessageDB.Adapter do
     repo.query(sql, params) |> map_results(opts)
   end
 
-  @spec message_store_version(opts :: [{:repo, Repo.t()}]) :: string_version :: String.t()
-  def message_store_version(opts) when is_list(opts) do
-    repo = Keyword.fetch!(opts, :repo)
-    {sql, params} = Functions.message_store_version()
-
-    repo.query(sql, params)
-    |> map_first_result(opts)
+  @spec message_store_version(Repo.t()) :: String.t()
+  def message_store_version(repo) do
+    sql = "SELECT message_store_version()"
+    repo.query(sql, []) |> map_first_result(opts)
   end
 
   @spec write_message(

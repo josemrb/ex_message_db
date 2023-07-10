@@ -113,7 +113,7 @@ defmodule ExMessageDB.MessageStore do
       end
 
       def message_store_version do
-        Adapter.message_store_version(repo: @repo)
+        Adapter.message_store_version(@repo)
       end
 
       def write_message(
