@@ -72,9 +72,15 @@ defmodule ExMessageDB.Adapter do
 
   defp map_first_result({:ok, %Postgrex.Result{rows: rows}}, opts) do
     case rows do
-      [] -> nil
-      [result | _] when is_binary(result) or is_integer(result) -> result
-      [result | _] -> map_row(result, opts)
+      [] ->
+        nil
+
+      [result | _] when is_binary(result) or is_integer(result) ->
+        result
+
+      [result | _] ->
+        repo = Keyword.fetch!(opts, :repo)
+        map_row(result, opts)
     end
   end
 
@@ -93,22 +99,22 @@ defmodule ExMessageDB.Adapter do
     {:error, message}
   end
 
-  defp map_results({:ok, %Postgrex.Result{num_rows: 0, rows: []}}, opts) when is_list(opts) do
+  defp map_results({:ok, %Postgrex.Result{num_rows: 0, rows: []}}, opts) do
     []
   end
 
   defp map_results({:ok, %Postgrex.Result{num_rows: num_rows, rows: rows}}, opts)
-       when num_rows > 0 and is_list(rows) and is_list(opts) do
-    Enum.map(rows, &map_row(&1, opts))
+       when num_rows > 0 and is_list(rows) do
+    repo = Keyword.fetch!(opts, :repo)
+    Enum.map(rows, &map_row(&1, repo))
   end
 
   defp map_results({:error, %Postgrex.Error{postgres: %{message: message}}}, opts)
-       when is_binary(message) and is_list(opts) do
+       when is_binary(message) do
     {:error, message}
   end
 
-  defp map_row(row, opts) when is_list(row) and is_list(opts) do
-    repo = Keyword.fetch!(opts, :repo)
+  defp map_row(row, repo) when is_list(row) do
     types = %{message: Message}
     repo.load(types, {[:message], row})
   end
