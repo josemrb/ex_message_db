@@ -61,7 +61,7 @@ defmodule ExMessageDB.Message do
     metadata = load_metadata(json_metadata)
 
     {:ok,
-     struct!(%__MODULE__{}, %{
+     %__MODULE__{
        id: id,
        stream_name: stream_name,
        type: type,
@@ -70,7 +70,7 @@ defmodule ExMessageDB.Message do
        data: data,
        metadata: metadata,
        time: time
-     })}
+     }}
   end
 
   def load(_data), do: :error
