@@ -4,7 +4,6 @@ defmodule ExMessageDB.Adapter do
   """
 
   alias Ecto.Repo
-  alias ExMessageDB.Functions
   alias ExMessageDB.Message
 
   @type maybe(t) :: nil | t

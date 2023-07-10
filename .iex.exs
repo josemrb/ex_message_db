@@ -6,7 +6,6 @@ defmodule ExMessageDB.Console do
   defmacro alias_internals do
     quote do
       alias ExMessageDB.Adapter
-      alias ExMessageDB.Functions
       alias ExMessageDB.Message
       alias ExMessageDB.MessageStore
       alias ExMessageDB.Repo
