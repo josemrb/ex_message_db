@@ -22,7 +22,7 @@ defmodule ExMessageDB.Adapter do
       ) do
     sql = "SELECT get_category_messages($1, $2, $3, $4, $5, $6, $7)"
     params = [category_name, position, batch_size, nil, nil, nil, nil]
-    repo.query(sql, params) |> map_results([])
+    repo.query(sql, params) |> map_results(repo)
   end
 
   # TODO I don't want my Message contained in a stupid map
@@ -46,7 +46,7 @@ defmodule ExMessageDB.Adapter do
   def get_stream_messages(stream_name, position, batch_size, repo) do
     sql = "SELECT get_stream_messages($1, $2, $3, $4)"
     params = [stream_name, position, batch_size, nil]
-    repo.query(sql, params) |> map_results(opts)
+    repo.query(sql, params) |> map_results(repo)
   end
 
   @spec message_store_version(Repo.t()) :: String.t()
@@ -99,21 +99,21 @@ defmodule ExMessageDB.Adapter do
     {:error, message}
   end
 
-  defp map_results({:ok, %Postgrex.Result{num_rows: 0, rows: []}}, opts) do
+  defp map_results({:ok, %Postgrex.Result{num_rows: 0, rows: []}}, _repo) do
     []
   end
 
-  defp map_results({:ok, %Postgrex.Result{num_rows: num_rows, rows: rows}}, opts)
+  defp map_results({:ok, %Postgrex.Result{num_rows: num_rows, rows: rows}}, repo)
        when num_rows > 0 and is_list(rows) do
-    repo = Keyword.fetch!(opts, :repo)
     Enum.map(rows, &map_row(&1, repo))
   end
 
-  defp map_results({:error, %Postgrex.Error{postgres: %{message: message}}}, opts)
+  defp map_results({:error, %Postgrex.Error{postgres: %{message: message}}}, _repo)
        when is_binary(message) do
     {:error, message}
   end
 
+  # https://hexdocs.pm/ecto/3.8.3/Ecto.Repo.html#c:load/2
   defp map_row(row, repo) when is_list(row) do
     types = %{message: Message}
     repo.load(types, {[:message], row})
