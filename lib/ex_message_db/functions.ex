@@ -1,6 +1,6 @@
 defmodule ExMessageDB.Functions do
   @moduledoc """
-  Functions.
+  Functions
   """
 
   @spec get_stream_messages(
