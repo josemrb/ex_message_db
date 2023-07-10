@@ -100,16 +100,7 @@ defmodule ExMessageDB.MessageStore do
 
       def get_category_messages(category_name, position \\ nil, batch_size \\ nil)
           when is_binary(category_name) do
-        Adapter.get_category_messages(
-          category_name,
-          position,
-          batch_size,
-          nil,
-          nil,
-          nil,
-          nil,
-          repo: @repo
-        )
+        Adapter.get_category_messages(category_name, position, batch_size, @repo)
       end
 
       def get_last_stream_message(stream_name) when is_binary(stream_name) do

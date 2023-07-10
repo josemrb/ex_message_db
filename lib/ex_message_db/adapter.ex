@@ -13,45 +13,27 @@ defmodule ExMessageDB.Adapter do
           category_name :: String.t(),
           position :: non_neg_integer() | nil,
           batch_size :: non_neg_integer() | -1 | nil,
-          correlation :: String.t() | nil,
-          consumer_group_member :: String.t() | nil,
-          consumer_group_size :: String.t() | nil,
-          condition :: Keyword.t() | nil,
-          opts :: [{:repo, Repo.t()}]
+          Repo.t()
         ) :: [] | [%{message: Message.t()}] | {:error, message :: String.t()}
   def get_category_messages(
         category_name,
         position,
         batch_size,
-        correlation,
-        consumer_group_member,
-        consumer_group_size,
-        condition,
-        opts
+        repo
       ) do
-    repo = Keyword.fetch!(opts, :repo)
-
-    {sql, params} =
-      Functions.get_category_messages(
-        category_name,
-        position,
-        batch_size,
-        correlation,
-        consumer_group_member,
-        consumer_group_size,
-        condition
-      )
-
-    repo.query(sql, params)
-    |> map_results(opts)
+    sql = "SELECT get_category_messages($1, $2, $3, $4, $5, $6, $7)"
+    params = [category_name, position, batch_size, nil, nil, nil, nil]
+    repo.query(sql, params) |> map_results([])
   end
 
   # TODO I don't want my Message contained in a stupid map
   # TODO This function can also apparently return an error tuple
-  @spec get_last_stream_message(stream_name :: String.t(), Repo.t()) :: maybe(%{message: Message.t()})
+  @spec get_last_stream_message(stream_name :: String.t(), Repo.t()) ::
+          maybe(%{message: Message.t()})
   def get_last_stream_message(stream_name, repo) do
-    sql = "SELECT get_last_stream_message($1)",
+    sql = "SELECT get_last_stream_message($1)"
     params = [stream_name]
+
     repo.query(sql, params)
     |> map_first_result([])
   end

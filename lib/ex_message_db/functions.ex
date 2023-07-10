@@ -3,32 +3,6 @@ defmodule ExMessageDB.Functions do
   Functions.
   """
 
-  @spec get_category_messages(
-          category_name :: String.t(),
-          position :: non_neg_integer() | nil,
-          batch_size :: non_neg_integer() | -1 | nil,
-          correlation :: String.t() | nil,
-          consumer_group_member :: String.t() | nil,
-          consumer_group_size :: String.t() | nil,
-          condition :: Keyword.t() | nil
-        ) :: {sql :: String.t(), params :: [term()]}
-  def get_category_messages(category_name, position, batch_size, nil, nil, nil, nil) do
-    function_call = "get_category_messages($1, $2, $3, $4, $5, $6, $7)"
-
-    {
-      "SELECT #{function_call}",
-      [
-        category_name,
-        position,
-        batch_size,
-        nil,
-        nil,
-        nil,
-        nil
-      ]
-    }
-  end
-
   @spec get_stream_messages(
           stream_name :: String.t(),
           position :: non_neg_integer() | nil,
