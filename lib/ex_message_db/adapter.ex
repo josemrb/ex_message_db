@@ -60,6 +60,7 @@ defmodule ExMessageDB.Adapter do
     repo.query(sql, params) |> map_results(repo)
   end
 
+  # TODO fix return type
   @spec message_store_version(Repo.t()) :: String.t()
   def message_store_version(repo) do
     sql = "SELECT message_store_version()"
