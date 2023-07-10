@@ -5,6 +5,8 @@ defmodule ExMessageDB.Adapter do
 
   alias Ecto.Repo
   alias ExMessageDB.Message
+  alias Postgrex.Error
+  alias Postgrex.Result
 
   @type maybe(t) :: nil | t
 
@@ -33,11 +35,12 @@ defmodule ExMessageDB.Adapter do
     sql = "SELECT get_last_stream_message($1)"
     params = [stream_name]
 
-    with {:ok, %Postgrex.Result{rows: rows}} <- repo.query(sql, params),
+    with {:ok, %Result{rows: rows}} <- repo.query(sql, params),
          [result] <- rows do
       map_row(result, repo)
     else
-      {:error, %Postgrex.Error{postgres: %{message: message}}} when is_binary(message) ->
+      # How do you know the postgres field will have this message map?
+      {:error, %Error{postgres: %{message: message}}} when is_binary(message) ->
         {:error, message}
 
       [] ->
@@ -62,7 +65,7 @@ defmodule ExMessageDB.Adapter do
     sql = "SELECT message_store_version()"
 
     case repo.query(sql, []) do
-      {:ok, %Postgrex.Result{rows: [version]}} when is_binary(version) -> version
+      {:ok, %Result{rows: [version]}} when is_binary(version) -> version
       # TODO this isn't quite what the original implementation had
       _ -> :error
     end
@@ -82,25 +85,25 @@ defmodule ExMessageDB.Adapter do
     params = [id, stream_name, type, data, metadata, expected_version]
 
     case repo.query(sql, params) do
-      {:ok, %Postgrex.Result{num_rows: 1, rows: [[result]]}}
+      {:ok, %Result{num_rows: 1, rows: [[result]]}}
       when is_binary(result) or is_integer(result) ->
         {:ok, result}
 
-      {:error, %Postgrex.Error{postgres: %{message: message}}} when is_binary(message) ->
+      {:error, %Error{postgres: %{message: message}}} when is_binary(message) ->
         {:error, message}
     end
   end
 
-  defp map_results({:ok, %Postgrex.Result{num_rows: 0, rows: []}}, _repo) do
+  defp map_results({:ok, %Result{num_rows: 0, rows: []}}, _repo) do
     []
   end
 
-  defp map_results({:ok, %Postgrex.Result{num_rows: num_rows, rows: rows}}, repo)
+  defp map_results({:ok, %Result{num_rows: num_rows, rows: rows}}, repo)
        when num_rows > 0 and is_list(rows) do
     Enum.map(rows, &map_row(&1, repo))
   end
 
-  defp map_results({:error, %Postgrex.Error{postgres: %{message: message}}}, _repo)
+  defp map_results({:error, %Error{postgres: %{message: message}}}, _repo)
        when is_binary(message) do
     {:error, message}
   end
