@@ -33,8 +33,16 @@ defmodule ExMessageDB.Adapter do
     sql = "SELECT get_last_stream_message($1)"
     params = [stream_name]
 
-    repo.query(sql, params)
-    |> map_first_result([])
+    with {:ok, %Postgrex.Result{rows: rows}} <- repo.query(sql, params),
+         [result] <- rows do
+      map_row(result, repo)
+    else
+      {:error, %Postgrex.Error{postgres: %{message: message}}} when is_binary(message) ->
+        {:error, message}
+
+      [] ->
+        nil
+    end
   end
 
   @spec get_stream_messages(
@@ -52,7 +60,12 @@ defmodule ExMessageDB.Adapter do
   @spec message_store_version(Repo.t()) :: String.t()
   def message_store_version(repo) do
     sql = "SELECT message_store_version()"
-    repo.query(sql, []) |> map_first_result(opts)
+
+    case repo.query(sql, []) do
+      {:ok, %Postgrex.Result{rows: [version]}} when is_binary(version) -> version
+      # TODO this isn't quite what the original implementation had
+      _ -> :error
+    end
   end
 
   @spec write_message(
@@ -76,25 +89,6 @@ defmodule ExMessageDB.Adapter do
       {:error, %Postgrex.Error{postgres: %{message: message}}} when is_binary(message) ->
         {:error, message}
     end
-  end
-
-  defp map_first_result({:ok, %Postgrex.Result{rows: rows}}, opts) do
-    case rows do
-      [] ->
-        nil
-
-      [result | _] when is_binary(result) or is_integer(result) ->
-        result
-
-      [result | _] ->
-        repo = Keyword.fetch!(opts, :repo)
-        map_row(result, opts)
-    end
-  end
-
-  defp map_first_result({:error, %Postgrex.Error{postgres: %{message: message}}}, opts)
-       when is_binary(message) and is_list(opts) do
-    {:error, message}
   end
 
   defp map_results({:ok, %Postgrex.Result{num_rows: 0, rows: []}}, _repo) do
