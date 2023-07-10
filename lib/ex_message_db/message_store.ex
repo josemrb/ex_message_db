@@ -155,7 +155,7 @@ defmodule ExMessageDB.MessageStore do
           data,
           metadata,
           expected_version,
-          repo: @repo
+          @repo
         )
       end
 
@@ -177,7 +177,7 @@ defmodule ExMessageDB.MessageStore do
           data,
           metadata,
           expected_version,
-          repo: @repo
+          @repo
         )
       end
     end

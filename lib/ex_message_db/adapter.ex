@@ -63,16 +63,12 @@ defmodule ExMessageDB.Adapter do
           data :: map(),
           metadata :: map() | nil,
           expected_version :: non_neg_integer() | -1 | nil,
-          opts :: [{:repo, Repo.t()}]
+          repo :: Repo.t()
         ) :: {:ok, position :: non_neg_integer()} | {:error, message :: String.t()}
   def write_message(id, stream_name, type, data, metadata, expected_version, opts) do
-    repo = Keyword.fetch!(opts, :repo)
-
-    {sql, params} =
-      Functions.write_message(id, stream_name, type, data, metadata, expected_version)
-
-    repo.query(sql, params)
-    |> map_tuple_result(opts)
+    sql = "SELECT write_message($1, $2, $3, $4, $5, $6)"
+    params = [id, stream_name, type, data, metadata, expected_version]
+    repo.query(sql, params) |> map_tuple_result([])
   end
 
   defp map_first_result({:ok, %Postgrex.Result{rows: rows}}, opts) do
