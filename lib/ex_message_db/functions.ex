@@ -3,21 +3,6 @@ defmodule ExMessageDB.Functions do
   Functions
   """
 
-  @spec get_stream_messages(
-          stream_name :: String.t(),
-          position :: non_neg_integer() | nil,
-          batch_size :: non_neg_integer() | -1 | nil,
-          condition :: Keyword.t() | nil
-        ) :: {sql :: String.t(), params :: [term()]}
-  def get_stream_messages(stream_name, position, batch_size, nil) do
-    function_call = "get_stream_messages($1, $2, $3, $4)"
-
-    {
-      "SELECT #{function_call}",
-      [stream_name, position, batch_size, nil]
-    }
-  end
-
   @spec message_store_version :: {sql :: String.t(), params :: []}
   def message_store_version do
     function_call = "message_store_version()"

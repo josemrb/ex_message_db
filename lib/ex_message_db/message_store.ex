@@ -109,13 +109,7 @@ defmodule ExMessageDB.MessageStore do
 
       def get_stream_messages(stream_name, position \\ nil, batch_size \\ nil)
           when is_binary(stream_name) do
-        Adapter.get_stream_messages(
-          stream_name,
-          position,
-          batch_size,
-          nil,
-          repo: @repo
-        )
+        Adapter.get_stream_messages(stream_name, position, batch_size, @repo)
       end
 
       def message_store_version do

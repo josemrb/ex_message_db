@@ -42,15 +42,12 @@ defmodule ExMessageDB.Adapter do
           stream_name :: String.t(),
           position :: non_neg_integer() | nil,
           batch_size :: non_neg_integer() | -1 | nil,
-          condition :: Keyword.t() | nil,
           opts :: [{:repo, Repo.t()}]
         ) :: [] | [%{message: Message.t()}] | {:error, message :: String.t()}
-  def get_stream_messages(stream_name, position, batch_size, condition, opts) do
-    repo = Keyword.fetch!(opts, :repo)
-    {sql, params} = Functions.get_stream_messages(stream_name, position, batch_size, condition)
-
-    repo.query(sql, params)
-    |> map_results(opts)
+  def get_stream_messages(stream_name, position, batch_size, repo) do
+    sql = "SELECT get_stream_messages($1, $2, $3, $4)"
+    params = [stream_name, position, batch_size, nil]
+    repo.query(sql, params) |> map_results(opts)
   end
 
   @spec message_store_version(opts :: [{:repo, Repo.t()}]) :: string_version :: String.t()
